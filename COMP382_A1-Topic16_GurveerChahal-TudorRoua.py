@@ -36,6 +36,7 @@ transitions2 = {
 # Defining the start and accept states of two NFAs (starting and final nodes)
 start1 = 'q1'
 start2 = 's1'
+
 accept1 = {'q4'}
 accept2 = {'s3', 's4'}
 
@@ -54,7 +55,7 @@ class NFA:
     # 2. The concatenate method returns the NFA produced by concatenating the first NFA to the second
     def concatenate(NFA1, NFA2):
 
-        # going to union all fields from both NFAs to "concatenate" each one
+        # going to union all fields from both NFAs to concatenate each one
 
         # NFA1 states (Union) NFA2 states
         states = NFA1.states.union(NFA2.states)
@@ -79,18 +80,21 @@ class NFA:
                     # add it directly to the key inside transitions dict
                     transitions[key].add(values)
 
-            # otherwise if the key doesn't exist then add the key-value
+            # otherwise if the key doesn't exist then add the key-value normally
             if key not in transitions:
                 transitions[key] = value.copy()
 
-
-
+        # link accept state to the
+        # start state of the second graph by using an epsilon (None)
+        for node in NFA1.accept:
+            key = (node, None)
+            transitions[key] = {NFA2.start}
 
 
         start = NFA1.start
         accept = NFA2.accept
 
-        #return(NFA(states, alphabet, transitions, start, accept))
+        return NFA(states, alphabet, transitions, start, accept)
 
 
     # 4. check input words
@@ -100,12 +104,12 @@ class NFA:
 
 
 # first NFA
-N1 = NFA(states1, alphabet1, transitions1, start1, end1)
+N1 = NFA(states1, alphabet1, transitions1, start1, accept1)
 
 # second NFA
-N2 = NFA(states2, alphabet2, transitions2, start2, end2)
+N2 = NFA(states2, alphabet2, transitions2, start2, accept2)
 
 # call concatenate
-#N = NFA.concatenate(N1, N2)
+N = NFA.concatenate(N1, N2)
 
         
