@@ -56,11 +56,37 @@ class NFA:
 
         # going to union all fields from both NFAs to "concatenate" each one
 
-        # combine node sets using a union
         # NFA1 states (Union) NFA2 states
         states = NFA1.states.union(NFA2.states)
-        #alphabet =
-        #transitions = 
+        alphabet = NFA1.alphabet.union(NFA2.alphabet)
+
+        # for transitions we don't want to use union because there will be conflicting
+        # keys in the dict, that is why instead we will have to use a different method
+        transitions = {}
+
+        # NFA1 - iterate over each (key,value) pair
+        for key, value in NFA1.transitions.items():
+            # store it in inside transitions
+            transitions[key] = value.copy()
+
+        # same thing for NFA2
+        for key , value in NFA2.transitions.items():
+
+            # if theres a conflict then add the value to transitions using the same key
+            if key in transitions:
+                # take each value out of values
+                for values in value:
+                    # add it directly to the key inside transitions dict
+                    transitions[key].add(values)
+
+            # otherwise if the key doesn't exist then add the key-value
+            if key not in transitions:
+                transitions[key] = value.copy()
+
+
+
+
+
         start = NFA1.start
         accept = NFA2.accept
 
