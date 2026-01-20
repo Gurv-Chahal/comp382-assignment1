@@ -52,7 +52,7 @@ class NFA:
         self.start = start
         self.accept = accept
 
-    # 2. The concatenate method returns the NFA produced by concatenating the first NFA to the second
+    # 2. the concatenate method returns the NFA produced by concatenating the first NFA to the second
     def concatenate(NFA1, NFA2):
 
         # going to union all fields from both NFAs to concatenate each one
@@ -98,18 +98,81 @@ class NFA:
 
 
     # 4. check input words
-    #def checkWord():
+    def checkWord(self, word):
+
+        # we need to build this helper function so that when at a state
+        # an epsilon (None) is checked for, otherwise no inputs will work correctly
+        def checkIfEpsilon(state):
+
+            # states discovered so far
+            closure = {}
+            closure[state] = 0
+
+            # create a stack of states/nodes
+            closureStack = [state]
+
+            # explore every reachable state
+            while len(closureStack) > 0:
+                # pop off first state
+                state = closureStack.pop(0)
+
+                # look through transitions dict and get values for (state, none)
+                # keys, which are next nodes epsilon reaches
+                epsilonStates = self.transitions.get((state, None), set())
+
+                # any nodes that epsilon points to add to the stack
+                for next in epsilonStates:
+                    if next not in closure:
+                        closure[next] = 0
+                        closureStack.append(next)
+
+            # return all nodes that can be reached by epsilon in graph in a set
+            return set(closure.keys())
+
+
+
+        # from start node save all nodes that can be reached by epsilon
+        currentStates = checkIfEpsilon(self.start)
+
+        for ch in word:
+
+            if ch not in self.alphabet:
+                return False
+
+            future = set()
+
+            # iterate over each node that can be reached by epsilon in the beginning
+            for state in currentStates:
+                # return value of (node, char) if exists which is a state
+                for next in self.transitions.get((state, ch), set()):
+                    # add value to set
+                    future.add(next)
+
+            newSet = set()
+
+            # iterate over every state from nodes that can be reached by epsilon
+            for state in future:
+                # check if epsilon exists fromn that node
+                epsStates = checkIfEpsilon(state)
+                # add nodes that can be reached by epsilon into a new set
+                for s in epsStates:
+                    newSet.add(s)
+
+            # update
+            currentStates = newSet
+
+        # iterate through each node
+        for state in currentStates:
+            # if the node is a final node (accept node)
+            if state in self.accept:
+                return True
+        return False
 
 
 
 
-# first NFA
 N1 = NFA(states1, alphabet1, transitions1, start1, accept1)
-
-# second NFA
 N2 = NFA(states2, alphabet2, transitions2, start2, accept2)
 
 # call concatenate
 N = NFA.concatenate(N1, N2)
-
-        
