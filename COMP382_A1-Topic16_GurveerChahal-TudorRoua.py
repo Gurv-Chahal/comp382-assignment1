@@ -169,10 +169,25 @@ class NFA:
         return False
 
 
+if __name__ == "__main__":
 
+    # create n1, n2, then concatenate using N
+    N1 = NFA(states1, alphabet1, transitions1, start1, accept1)
+    N2 = NFA(states2, alphabet2, transitions2, start2, accept2)
+    N  = NFA.concatenate(N1, N2)
 
-N1 = NFA(states1, alphabet1, transitions1, start1, accept1)
-N2 = NFA(states2, alphabet2, transitions2, start2, accept2)
+    tests = [
+        ("N1", N1, "ca"),
+        ("N1", N1, "ba"),
+        ("N1", N1, "a"),
+        ("N2", N2, "x"),
+        ("N2", N2, "y"),
+        ("N2", N2, "z"),
+        ("N",  N,  "cax"),
+        ("N",  N,  "ca"),
+        ("N",  N,  "x"),
+    ]
 
-# call concatenate
-N = NFA.concatenate(N1, N2)
+    # print
+    for name, machine, word in tests:
+        print(f"{name}.checkWord('{word}') -> {machine.checkWord(word)}")
