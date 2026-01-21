@@ -6,6 +6,11 @@ Implement a class for an NFA, with a member function that performs the operation
 <br><br>
 This assignment was completed using Python, without any external libraries.
 
+
+### Vlog Links
+Tudor Roua: https://youtu.be/fmFj4LxssQo
+
+
 ### References
 Campbell, R. (2026). *Sec 1.2 Nondeterminism Sec 1.3 Regular Expressions* \[PDF]. UFV Brightspace. https://brightspace.ufv.ca/d21/login|
 
