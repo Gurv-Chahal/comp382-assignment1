@@ -1,4 +1,4 @@
-
+import random
 
 # Defining the set of states for two NFAs (set of nodes)
 states1 = {'q1', 'q2', 'q3', 'q4'}
@@ -168,13 +168,79 @@ class NFA:
                 return True
         return False
 
+    # Function to generate a small but random NFA
+    def randomNFAGenerate():
+
+        # A function that checks if the accept state of the NFA can be
+        # reached from the start state
+        def solutionCheck(start, accept, transitions):
+            visited = {start}
+            toCheck = [start]
+
+            while len(toCheck) > 0:
+                current = toCheck.pop()
+
+                # This checks every reachable state beginning with the start
+                # state and adds all reachable states to a visited set
+                for (state, symbol), resultsSet in transitions.items():
+                    if state == current:
+                        for value in resultsSet:
+                            if value not in visited:
+                                visited.add(value)
+                                toCheck.append(value)
+
+            # The function returns true if the accept state is visited, and
+            # false otherwise
+            return accept.issubset(visited)
+
+        rStates = set()
+        # Generate 2-3 states, from r1 up to r3
+        randomStatesNumber = range(1, random.randint(3, 4))
+        for i in randomStatesNumber:
+            rStates.add(f'r{i}')
+
+        rAlphabet = set()
+        # Generate an alphabet using numbers, from 0 up to 2
+        for i in range(0, random.randint(2, 3)):
+            rAlphabet.add(f'{i}')
+        rAlphabet.add(None)
+
+        rTransitions = {}
+        for i in rStates:
+            for j in rAlphabet:
+                # This will determine the # of transitions a state and alphabet
+                # combination will have
+                k = random.randint(0, len(rStates))
+                if k == 0:
+                    continue
+                tempSet = rStates.copy()
+
+                # Create the new transition
+                rTransitions.setdefault((i, j), set())
+                while k > 0:
+                    # Add states reached by the newly made transition at random
+                    rTransitions[(i, j)].add(random.choice(tuple(tempSet)))
+                    tempSet.pop()
+                    k -= 1
+
+        # Randomly select the start and accept states
+        rStart = random.choice(tuple(rStates))
+        rAccept = {random.choice(tuple(rStates))}
+
+        # Check if there is a solution. If not, completely remake the NFA
+        while not solutionCheck(rStart, rAccept, rTransitions):
+            return NFA.randomNFAGenerate()
+
+        return NFA(rStates, rAlphabet, rTransitions, rStart, rAccept)
 
 if __name__ == "__main__":
 
     # create n1, n2, then concatenate using N
     N1 = NFA(states1, alphabet1, transitions1, start1, accept1)
     N2 = NFA(states2, alphabet2, transitions2, start2, accept2)
+    N3 = NFA.randomNFAGenerate()
     N  = NFA.concatenate(N1, N2)
+    NRandom = NFA.concatenate(N1, N3)
 
     tests = [
         ("N1", N1, "ca"),
@@ -183,9 +249,15 @@ if __name__ == "__main__":
         ("N2", N2, "x"),
         ("N2", N2, "y"),
         ("N2", N2, "z"),
+        ("N3", N3, "01"),
+        ("N3", N3, "1"),
+        ("N3", N3, "00"),
         ("N",  N,  "cax"),
         ("N",  N,  "ca"),
         ("N",  N,  "x"),
+        ("NRandom", NRandom, "ca01"),
+        ("NRandom", NRandom, "ca00"),
+        ("NRandom", NRandom, "ca11"),
     ]
 
     # print
